@@ -1,57 +1,42 @@
-# Navodila za izdelavo testnega projekta
+# Courses API
+- podatkovna baza Postgres
+- api za učenje (podobno kot https://app.thesmartestway.com/ ali https://www.brainscape.com/)
 
-- ustvari nov Nestjs projekt z naslednjimi lastnostmi:
-  - za podatkovno bazo uporabi Postgres
-  - za ORM uporabi TypeORM
-- ustvari api za aplikacijo za učenje (podobno kot https://app.thesmartestway.com/ ali https://www.brainscape.com/)
+- aplikacija vsebuje vprašanja, ki so združena v sklope(course)
+- vsako vprašanje je možno oceniti z 1-5 (5 pomeni da je vprašanje opravljeno)
+- ko so vsa vprašanjaa v sklopu opravljena ga je možno resertirati
 
-  - aplikacija naj ima seznam vprašanj in odgovorov
-  - vsako vprašanje lahko oceniš 1-5 (večkrat)
-  - če vprašanje oceniš z 5 je vprašanje opravljeno
-  - stanje je mogoče tudi resetirati, kadar so opravljena vsa vprašanja, vendar želimo imeti zgodovino ocenenjenih vprašanj za analitiko, zato ne zbriši ocen
+## Dostopne poti
 
-- dostopni morajo bit naslednji routi:
-  - seznam vprašanj in odgovorov
-  - ocenjevanje vprašanja
-    - shrani vsako oceno (ne prepiši prejšnje ocene)
-  - seznam ocen vprašanj
-    - če uporabnik večkrat oceni isto vprašanje se upošteva samo zadnja ocena
-    - če je stanje resetirano se upoštevajo ocene od resetiranega stanja naprej
-  - resetiranje stanja
-  - procent opravljenih vprašanj
-  - dodajanje novega vprašanja in odgovora
-- api se mora držati REST principov
-- frontend ni potreben
+### Zmeraj dostopni
+  - [POST]`/api/auth/signup` Registracija novega uporabnika
+  - [POST]`/api/auth/login` Prijava z e-naslovom ter geslom
 
-## Če še ti ostane kaj časa
+### Za lažje testiranje
+  - [GET]`/api/users` Seznam vseh uporabnikov
+  - [GET]`/api/users/{id}` Podrobni podatki o enem uporabniku
+  - [POST]`/api/auth/signout` Odjava
+  - [GET]`/api/auth` Vrne podatke o trenutno prijavljenem uporabniku
+### Kreiranje podatkov
+  - [POST]`/api/course` Ustvari novi sklop
+  - [POST]`/api/course/{id}` Doda novo vprašanje v sklop
+  - [GET]`/api/course` Vrne seznam vseh sklopov
+  - [GET]`/api/course/{id}` Vrne podatke o sklopu, vključno z vsemi vprašanji
+### Uporaba podatkov
+  - [POST]`/api/course/startCourse` Uporabniku dodelimo sklop(uporabnik ga začne reševati)
+  - [POST]`/api/course/resetCourse` Ponastavimo odgovore na vprašanja
+  - [GET]`/api/course/getStats/{id}` Prodibimo statistiko končanih vprašanj
+  - [POST]`/api/grade` Podamo oceno vprašanja 1-5
+  - [GET]`/api/grade` Pridobimo zadnjo veljavno oceno vprašanja
 
-- (plus) za avtentikacijo uporabi JWT žeton (samo access token)
-- (plus) pripravi tudi Swagger dokumentacijo in Swagger UI
-- (plus) vsi route-i se morajo začeti z prefixom `/api`
-- (plus) api more biti tudi verzioniran (v1)
-- (plus) projekt tudi zbuildaj v Docker image in pripravi docker-compose.yml datoteko, ki pripravi celotno okolje (postgres, nestjs) za zagon projekta
-- (plus) dodaj tudi rate limiting
-- (plus) za rate limiting lahko uporabiš tudi Redis (dodaj v docker-compose.yml)
+## Dodatne funkcionalnosti
 
-## Plan
+- JWT avtentikacija
+- Swagger dokumentacija in Swagger UI
+- Routi se začnejo z `/api`
+- `docker-compose.yml` z katerim je možno pognati aplikacijo
 
-- struktura:
-  - course(array vprasanj, title)
-  - solving(user, course, datum pricetka)
-  - vprasanje(text vprasanje, text odgovor)
-  - ocena(povezava uporabnik, povezava vprasanje, vrednost 1-5, datum ocene)
-  - uporabnik(id,ime,geslo...)
-- routes:
+## Uporaba
+- Za zagon docker slike se najprej uporabi ukaz `docker-compose build` in nato za zagon  `docker-compose up`.
+- Za zagon v razvijalskem načinu je potrebno dodati datoteko `.env.development` ter namestiti knjižnice z `npm i`. Aplikacija se nato zažene z `npm run start:dev`.
 
-courseController:
-
-/- /course?id=
-
-- /getStats?courseId=
-  /- /reset?courseId= (datum pricetka nastavi na currentDate)
-  /- /addQuestion?courseId=
-
-gradeController:
-
-/- /grade?questionId=
-/- /getGrade?questionId (latest)
